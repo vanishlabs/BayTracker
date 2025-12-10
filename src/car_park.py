@@ -46,6 +46,7 @@ class CarPark:
                 config["capacity"],
                 None,
                 config["plates"],
+                config_path
             )
 
     def write_config(self) -> None:
