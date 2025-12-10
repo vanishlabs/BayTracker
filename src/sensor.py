@@ -76,11 +76,11 @@ class ParkingSensor(Sensor):
         super().__init__(id, is_active, car_park)
 
     # detect fake vehicle (call in tests)
-    def detect_vehicle(self) -> None:
+    def detect_vehicle(self, plate: str | None = None) -> None:
         if not self.is_active:
             return
 
-        plate = self._scan_plate()
+        plate = plate or self._scan_plate()
         self.update_car_park(plate)
 
     # return mock plates

@@ -63,13 +63,18 @@ class CarPark:
 
     # from carpark-guide.md
     @classmethod
-    def from_config(cls, config_path: Path):
+    def from_config(cls, config_path: Path) -> CarPark:
         """
         Construct a new carpark from a configuration file.
 
         :param config_path: The path the the carpark config.
         :type config_path: Path
         """
+        if not os.path.exists(config_path):
+            raise FileExistsError(
+                "The specified path to the config file does not exist."
+            )
+
         # open our config file
         with config_path.open() as file:
             # deserialise in to our config dict
@@ -80,7 +85,7 @@ class CarPark:
                 config["capacity"],
                 None,
                 config["plates"],
-                config_path
+                config_path,
             )
 
     def write_config(self) -> None:
