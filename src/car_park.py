@@ -14,6 +14,11 @@ class CarPark:
         self.displays = displays or []
         self.plates = plates or []
         self.ambient_temp = 0
+        self.config_path = config_path
+
+        # write the config if one with the same name doesnt exist
+        # i was going to read it if one did exist, but unsure of preferred behaviour
+        self.write_config() if not os.path.exists(config_path) else None
 
     def __str__(self) -> str:
         return f"Car park is located at {self.location} with capacity {self.capacity}"
@@ -21,6 +26,41 @@ class CarPark:
     @property
     def available_spaces(self) -> int:
         return max(0, self.capacity - len(self.plates))
+
+    # from carpark-guide.md
+    @classmethod
+    def from_config(cls, config_path: Path):
+        """
+        Construct a new carpark from a configuration file.
+
+        :param config_path: The path the the carpark config.
+        :type config_path: Path
+        """
+        # open our config file
+        with config_path.open() as file:
+            # deserialise in to our config dict
+            config = json.load(file)
+            # return/construct new carpark class with config variables
+            return cls(
+                config["location"],
+                config["capacity"],
+                None,
+                config["plates"],
+                config_path
+            )
+
+    def write_config(self) -> None:
+        """
+        Write carpark config to file (`self.config_path`).
+        """
+        with self.config_path.open("w") as file:
+            config = {
+                "location": self.location,
+                "capacity": self.capacity,
+                "plates": self.plates,
+            }
+
+            json.dump(config, file)
 
     def register(self, display: Display) -> None:
         self.displays.append(display)
