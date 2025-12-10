@@ -18,7 +18,7 @@ class Display:
         :param data: The data to update our message with (available space and temperature)
         :type data: dict[str, int | float]
         """
-        if self.is_active:
+        if not self.is_active:
             return
         
         self.message = ""

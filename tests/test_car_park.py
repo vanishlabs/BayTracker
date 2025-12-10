@@ -7,7 +7,8 @@ from src.car_park import CarPark
 
 class TestCarPark(unittest.TestCase):
     def setUp(self):
-        with Path("config.json").open("w") as file:
+        self.config_path = Path("test-config.json")
+        with self.config_path.open("w") as file:
             config = {
                 "capacity": 100,
                 "location": "123 Example Street",
@@ -16,30 +17,30 @@ class TestCarPark(unittest.TestCase):
 
             json.dump(config, file)
 
-        self.car_park_with_config = CarPark.from_config(Path("config.json"))
         self.car_park = CarPark("123 Example Street", 100)
+
+    def tearDown(self) -> None:
+        if os.path.exists(self.config_path):
+            os.remove(self.config_path)
 
     def test_car_park_from_config(self):
         # test if initialised correctly from config
-        self.assertIsInstance(self.car_park_with_config, CarPark)
-        self.assertEqual(self.car_park_with_config.location, "123 Example Street")
-        self.assertEqual(self.car_park_with_config.capacity, 100)
-        self.assertEqual(self.car_park_with_config.plates, ["FAKE-001"])
-        self.assertEqual(self.car_park_with_config.displays, [])
-        self.assertEqual(self.car_park_with_config.available_spaces, 99)
+        car_park_with_config = CarPark.from_config(self.config_path)
+
+        self.assertIsInstance(car_park_with_config, CarPark)
+        self.assertEqual(car_park_with_config.location, "123 Example Street")
+        self.assertEqual(car_park_with_config.capacity, 100)
+        self.assertEqual(car_park_with_config.plates, ["FAKE-001"])
+        self.assertEqual(car_park_with_config.displays, [])
+        self.assertEqual(car_park_with_config.available_spaces, 99)
 
     def test_car_park_write_config_file(self):
         # tests if writes file.
-        self.car_park.config_path = Path("test-config.json")
-        path = Path(self.car_park.config_path)
-        if os.path.exists(path):
-            os.remove(path)
-
+        self.car_park.config_path = self.config_path
         self.car_park.add_car("FAKE-001")
-
         self.car_park.write_config()
 
-        self.assertEqual(os.path.exists(path), True)
+        self.assertEqual(os.path.exists(self.config_path), True)
 
     def test_car_park_initialized_with_all_attributes(self):
         self.assertIsInstance(self.car_park, CarPark)
